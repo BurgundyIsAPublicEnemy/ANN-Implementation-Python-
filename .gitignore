@@ -3,5 +3,4 @@
 
 # But not these files...
 !*.py
-!*.txt
 !*.ipynb
