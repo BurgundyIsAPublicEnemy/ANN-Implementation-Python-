@@ -72,8 +72,33 @@ kx_list = kx.kcross(batch_x1, batch_y1)
 #print(kx_list[9])
 #iterate and go thru and evaluate
 print(len(kx_list))
+print(((kx_list[0][0])))
+
+print('\n\n\n')
+print(((kx_list[0][1])))
+
+#print(list(zip(*kx_list[0][0]))[0])
+#print(list(zip(*kx_list[0][0]))[1])
+
+'''
+for i in range(0, len(kx_list)):
+    #this becomes batch_y
+    print(kx_list[i][0])
+    batch_y_x = kx_list[i][0]
+    print('\n\n\n')
+    #this becomes batch_x
+    batch_x_x = kx_list[i][1]
+    print(kx_list[i][1])
+    print('\n\n\n')
+'''
+
+
 sys.exit(0)
 
+
+
+
+'''
 label=batch_y2#+1e-50-1e-50
 
 batch_x=np.column_stack((batch_x1, batch_x2))
@@ -116,3 +141,4 @@ with tf.Session() as sess:
     accuracy1 = tf.reduce_mean(tf.cast(correct_prediction1, tf.float32))
 
     print(accuracy1.eval({X: batch_x}))
+'''

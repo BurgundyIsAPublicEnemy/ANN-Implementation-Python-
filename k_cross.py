@@ -13,7 +13,7 @@ class kcross():
             return xfold
         else:
             xfold.append((testFold, restFold))
-            return self.getTestChunk(fold, len(fold), (j - 1), xfold)
+            return self.getTestSlice(fold, len(fold), (j - 1), xfold)
 
 
     def kcross(self, batch_x, batch_y):
