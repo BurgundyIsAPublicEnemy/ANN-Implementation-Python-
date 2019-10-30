@@ -65,9 +65,13 @@ batch_x2=np.loadtxt('x2.txt')
 batch_y1=np.loadtxt('y1.txt')
 batch_y2=np.loadtxt('y2.txt')
 
-kx().kcross(batch_x1, batch_y1)
+kx = kx()
+kx_list = kx.kcross(batch_x1, batch_y1)
 
-
+#can i get a check on this??
+#print(kx_list[9])
+#iterate and go thru and evaluate
+print(len(kx_list))
 sys.exit(0)
 
 label=batch_y2#+1e-50-1e-50
