@@ -2,6 +2,8 @@
 *
 
 # But not these files...
+!.gitignore
 !*/
+!*.md
 !*.py
 !*.ipynb
