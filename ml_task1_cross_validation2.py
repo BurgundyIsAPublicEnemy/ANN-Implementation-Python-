@@ -5,8 +5,7 @@ import logging
 logging.basicConfig(level=logging.DEBUG)
 import matplotlib.pyplot as plt
 import scipy.io as sio # The library to deal with .mat
-import sys
-from k_cross import kcross as kx
+from sklearn.utils import shuffle
 
 #Network parameters
 n_hidden1 = 10
@@ -65,94 +64,42 @@ batch_x2=np.loadtxt('x2.txt')
 batch_y1=np.loadtxt('y1.txt')
 batch_y2=np.loadtxt('y2.txt')
 
-kx = kx()
-kx_list = kx.kcross(batch_x1, batch_y1)
-
-#can i get a check on this??
-#print(kx_list[9])
-#iterate and go thru and evaluate
-
-batch_rest = []
-for i in range(0, len(kx_list)):
-    #this becomes batch_y
-    bt_y = kx_list[i][0]
-    batch_x2 = np.asarray(list(zip(*bt_y))[0])
-    batch_y2 = np.asarray(list(zip(*bt_y))[1])
-
-    for j in range(0, len(kx_list)):
-        if j != i:
-            btr_y = kx_list[j][1]
-            batch_rest.append(btr_y)
-
-    btr_y = sum(btr_y, [])
-    batch_x1 = np.asarray(list(zip(*btr_y))[0])
-    batch_y1 = list(zip(*btr_y))[1]
-
-
-
-    label=batch_y2#+1e-50-1e-50
-
-
-    batch_x=np.column_stack((batch_x1, batch_x2))
-    batch_y=np.column_stack((batch_y1, batch_y2))
-
-    batch_x_train=batch_x[:,0:599]
-    batch_y_train=batch_y[:,0:599]
-
-    batch_x_test=batch_x[:,600:1000]
-    batch_y_test=batch_y[:,600:1000]
-
-    with tf.Session() as sess:
-        sess.run(init)
-        #Training epoch
-        for epoch in range(number_epochs):
-            sess.run(optimizer, feed_dict={X: batch_x_train, Y: batch_y_train})
-            #Display the epoch
-            if epoch % 100 == 0:
-                print("Epoch:", '%d' % (epoch))
-
-        # Test model
-        pred = (neural_network)  # Apply softmax to logits
-        accuracy=tf.keras.losses.MSE(pred,Y)
-        print("Accuracy:", accuracy.eval({X: batch_x_train, Y: batch_y_train}))
-        #tf.keras.evaluate(pred,batch_x)
-
-        print("Prediction:", pred.eval({X: batch_x_train}))
-        output=neural_network.eval({X: batch_x_train})
-        plt.plot(batch_y_train[0:10], 'ro', output[0:10], 'bo')
-        plt.ylabel('some numbers')
-        plt.show()
-
-        estimated_class=tf.argmax(pred, 1)#+1e-50-1e-50
-        correct_prediction1 =  tf.equal(tf.argmax(pred, 1),label)
-        accuracy1 = tf.reduce_mean(tf.cast(correct_prediction1, tf.float32))
-
-        #print(accuracy1.eval({X: batch_x}))
-
-
-    sys.exit(0)
-
-
-sys.exit(0)
-
-
-
-
-'''
 label=batch_y2#+1e-50-1e-50
 
 batch_x=np.column_stack((batch_x1, batch_x2))
 batch_y=np.column_stack((batch_y1, batch_y2))
 
-batch_x_train=batch_x[:,0:599]
-batch_y_train=batch_y[:,0:599]
 
-batch_x_test=batch_x[:,600:1000]
-batch_y_test=batch_y[:,600:1000]
 
-label_train=label[0:599]
+batch_x_train=batch_x[:,0:99]
+batch_y_train=batch_y[:,0:99]
+
+batch_x_test=batch_x[:,100:1000]
+batch_y_test=batch_y[:,100:1000]
+
+label_train=label[0:99]
 
 label_test=label[600:1000]
+
+
+#------------------
+batch_x, batch_y = shuffle(batch_x, batch_y, random_state=0)
+
+print('SPLITTING')
+split_x = np.array_split(batch_x, 10)
+split_y = np.array_split(batch_y, 10)
+
+batch_x_test = split_x[0]
+batch_y_test = np.array_split(batch_y, 10)[0]
+
+print(batch_x_test)
+print('SPLITTING LEN')
+j = 0
+batch_x_test= [x for i,x in enumerate(split_x) if i!=j]
+batch_y_test= [x for i,x in enumerate(split_y) if i!=j]
+#Shuffle
+#Split
+print
 
 with tf.Session() as sess:
     sess.run(init)
@@ -181,4 +128,3 @@ with tf.Session() as sess:
     accuracy1 = tf.reduce_mean(tf.cast(correct_prediction1, tf.float32))
 
     print(accuracy1.eval({X: batch_x}))
-'''
