@@ -1,5 +1,5 @@
 import random
-
+import h5py
 import numpy as np
 import tensorflow as tf
 import math
@@ -15,6 +15,7 @@ n_hidden1 = 10
 n_hidden2 = 10
 n_input = 2
 n_output = 2
+k_slice = 10
 # Learning parameters
 learning_constant = 0.2
 number_epochs = 1000
@@ -87,24 +88,35 @@ random.shuffle(zipped)
 batch_x, batch_y = zip(*zipped)
 
 # SPLITTING
-split_x = np.array_split(batch_x, 10)
-split_y = np.array_split(batch_y, 10)
+split_x = np.array_split(batch_x, k_slice)
+split_y = np.array_split(batch_y, k_slice)
 
 batch_x_train = np.arange(2).reshape(1, 2)
 batch_y_train = np.arange(2).reshape(1, 2)
 
 mean_acc = 0
 
-for i in range(10):
+for i in range(k_slice):
     # ASSIGN
     batch_x_test = split_x[i]
     batch_y_test = split_y[i]
 
-    for j in range(10):
+    for j in range(k_slice):
         if i != j:
             batch_x_train = np.append(batch_x_train, split_x[j], axis=0)
             batch_y_train = np.append(batch_y_train, split_y[j], axis=0)
             print(batch_y_train)
+
+    f = open("test.txt", "a")
+    f.write(str(batch_x_train))
+    f.write('\n\n\n')
+    f.write(str(batch_x_test))
+    f.write('\n\n\n')
+    f.close()
+    print("Train Index for X: ", len(batch_x_train), "\n")
+    print("Train Index for Y: ",len(batch_y_train), "\n")
+    print("Test Index for X: ", len(batch_x_test), "\n")
+    print("Test Index for Y: ", len(batch_y_test), "\n")
 
     with tf.Session() as sess:
         sess.run(init)
@@ -135,10 +147,9 @@ for i in range(10):
         print(accuracy1.eval({X: batch_x}))
         mean_acc += (accuracy1.eval({X: batch_x}))
 
+        batch_x_train = np.arange(2).reshape(1, 2)
+        batch_y_train = np.arange(2).reshape(1, 2)
 
-print(mean_acc/10)
+print(mean_acc/k_slice)
 # Shuffle
 # Split
-
-
-
