@@ -83,23 +83,23 @@ label_test=label[600:1000]
 
 
 #------------------
+print('RANDOMISE')
 batch_x, batch_y = shuffle(batch_x, batch_y, random_state=0)
 
 print('SPLITTING')
 split_x = np.array_split(batch_x, 10)
 split_y = np.array_split(batch_y, 10)
 
+print('ASSIGN')
 batch_x_test = split_x[0]
-batch_y_test = np.array_split(batch_y, 10)[0]
+batch_y_test = split_y[0]
 
-print(batch_x_test)
-print('SPLITTING LEN')
 j = 0
-batch_x_test= [x for i,x in enumerate(split_x) if i!=j]
-batch_y_test= [x for i,x in enumerate(split_y) if i!=j]
+batch_x_train= [x for i,x in enumerate(split_x) if i!=j]
+batch_y_train= [x for i,x in enumerate(split_y) if i!=j]
 #Shuffle
 #Split
-print
+
 
 with tf.Session() as sess:
     sess.run(init)
