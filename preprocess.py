@@ -27,7 +27,7 @@ class preprocess():
 		        all_labels_array.append(rowall_labels_array)
 
 		all_labels_array = np.asarray(all_labels_array)
-
+		
 		#conv (6) to (49,2)
 
 		print(len(all_points_array), len(all_labels_array))

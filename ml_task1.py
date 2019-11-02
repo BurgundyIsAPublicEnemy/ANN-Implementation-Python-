@@ -4,9 +4,9 @@ import numpy as np
 import tensorflow as tf
 import math
 import logging
-from preprocess import preprocess
+from preprocess import preprocess as pp
 
-logging.basicConfig(level=logging.DEBUG)
+logging.basicConfig(level=logging.WARN)
 import matplotlib.pyplot as plt
 import scipy.io as sio  # The library to deal with .mat
 from sklearn.utils import shuffle
@@ -22,7 +22,6 @@ learning_constant = 0.2
 number_epochs = 1000
 batch_size = 1000
 
-sys.exit(0)
 # Defining the input and the output
 X = tf.placeholder("float", [None, n_input])
 Y = tf.placeholder("float", [None, n_output])
@@ -74,8 +73,10 @@ batch_y2 = np.loadtxt('y2.txt')
 
 label = batch_y2  # +1e-50-1e-50
 
-batch_x, batch_y = preprocess().run()
-
+batch_x, batch_y = pp.run()
+print (batch_x1.shape, batch_x2.shape, batch_y1.shape, batch_y2.shape)
+print(batch_x.shape, batch_y.shape)
+#help shaping??
 
 label_train = label[0:99]
 
