@@ -1,9 +1,10 @@
 import random
-import h5py
+import h5py, os, sys
 import numpy as np
 import tensorflow as tf
 import math
 import logging
+from preprocess import preprocess
 
 logging.basicConfig(level=logging.DEBUG)
 import matplotlib.pyplot as plt
@@ -21,6 +22,7 @@ learning_constant = 0.2
 number_epochs = 1000
 batch_size = 1000
 
+sys.exit(0)
 # Defining the input and the output
 X = tf.placeholder("float", [None, n_input])
 Y = tf.placeholder("float", [None, n_output])
@@ -72,8 +74,8 @@ batch_y2 = np.loadtxt('y2.txt')
 
 label = batch_y2  # +1e-50-1e-50
 
-batch_x = np.column_stack((batch_x1, batch_x2))
-batch_y = np.column_stack((batch_y1, batch_y2))
+batch_x, batch_y = preprocess().run()
+
 
 label_train = label[0:99]
 
