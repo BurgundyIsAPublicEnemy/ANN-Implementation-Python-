@@ -23,7 +23,10 @@ for filename in os.listdir(cwd + '/BP4D/2DFeatures/'):
 
         for i in range(0, len(labels_obj)):  # Iterate over the list to fetch each frame’s landmarks array
             strings = fh[labels_obj[i][0]]
-            y[i] = strings  # Returns 49*2 numpy array
+            try:
+            	y[i] = strings  # Returns 49*2 numpy array
+            except:
+            	pass
 
         xFull = np.append(xFull, x, axis=0)
         yFull = np.append(yFull, x, axis=0)
