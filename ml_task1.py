@@ -83,7 +83,7 @@ label_test = label[600:1000]
 # RANDOMISE
 zipped = list(zip(batch_x, batch_y))
 
-random.shuffle(zipped)
+shuffle(zipped)
 
 batch_x, batch_y = zip(*zipped)
 
