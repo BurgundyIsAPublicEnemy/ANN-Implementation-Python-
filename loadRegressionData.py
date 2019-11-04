@@ -35,7 +35,7 @@ n_slices = 10
 #Learning parameters
 learning_constant = 0.002
 number_epochs = 100
-batch_size = 10000
+batch_size = 1000
 
 #Defining the input and the output
 X = tf.placeholder("float", [None, n_input])
@@ -106,16 +106,93 @@ batch_x, batch_y = zip(*zipped)
 
 #SPLIT INTO K FOLD
 kf = KFold(n_slices)
-batch_x = kf.get_n_splits(n_slices)
-batch_y = kf.get_n_splits(n_slices)
 
+batch_x = np.array_split(batch_x, n_slices)
+batch_y = np.array_split(batch_y, n_slices)
 mean_acc = 0
-for train_index, test_index in kf:
-    #get slice?????????????? todo after din dins
-    batch_x_test=kf[i]
-    batch_y_test=kf[i]
 
-    for j in range(crossValidationK):
+for train_index, test_index in kf.split(batch_x):
+    print(train_index, test_index)
+    batch_x_test=batch_x[int(test_index)]
+    batch_y_test=batch_y[int(test_index)]
+
+    for j in train_index:
+        try:
+            batch_x_train = np.append(batch_x_train, batch_x[j], axis=0)
+            batch_y_train = np.append(batch_y_train, batch_y[j], axis=0)
+        except:
+            batch_x_train = batch_x[j]
+            batch_y_train = batch_y[j]
+    print(len(batch_x_train), len(batch_x_train), len(batch_x_test), len(batch_y_test))
+    label_train=label
+
+    label_test=label
+    with tf.Session() as sess:
+        sess.run(init)
+        #Training epoch
+        for epoch in range(number_epochs):
+            #Get one batch of images
+            #batch_x, batch_y = mnist.train.next_batch(batch_size)
+
+            #print (batch_x)
+            #print ((batch_x.shape))
+            #Run the optimizer feeding the network with the batch
+            sess.run(optimizer, feed_dict={X: batch_x_train, Y: batch_y_train})
+            #Display the epoch
+            if epoch % 100 == 0 and epoch>10:
+                print("Epoch:", '%d' % (epoch))
+                print("Accuracy:", loss_op.eval({X: batch_x_train, Y: batch_y_train}) )
+
+
+        # Test model
+        pred = (neural_network)  # Apply softmax to logits
+        accuracy=tf.keras.losses.MSE(pred,Y)
+        print("Accuracy:", np.square(accuracy.eval({X: batch_x_train, Y: batch_y_train})).mean() )
+        #tf.keras.evaluate(pred,batch_x)
+
+        print("Prediction:", pred.eval({X: batch_x_train}))
+        print(batch_y)
+
+        output=neural_network.eval({X: batch_x_train})
+        plt.plot(batch_y_train, 'r', output, 'b')
+        plt.ylabel('some numbers')
+        plt.show()
+
+
+        plt.plot(batch_y_train[30000:300020], 'r', output[30000:300020], 'b')
+        plt.ylabel('some numbers')
+        plt.show()
+
+        print(batch_y_train[30000:300020])
+        print(output[30000:300020])
+
+        df = DataFrame(output)
+
+        export_csv = df.to_csv ('output.csv', index = None, header=True) #Don't forget to add '.csv' at the end of the path
+
+        print (df)
+        correct_prediction = tf.math.subtract((pred), (Y))
+        # Calculate accuracy
+        accuracy = tf.reduce_mean(tf.cast(correct_prediction, "float"))
+        print("Accuracy:", accuracy.eval({X: batch_x, Y: batch_y}))
+        mean_acc += accuracy
+        batch_x_train = []
+        batch_y_train = []
+
+print(mean)
+
+
+
+
+sys.exit(0)
+mean_acc = 0
+for i in range(n_slices):
+    batch_y_train = []
+    batch_x_train = []
+    batch_x_test=batch_x[i]
+    batch_y_test=batch_y[i]
+
+    for j in range(n_slices):
         if i != j:
             batch_x_train = np.append(batch_x_train, batch_x[j], axis=0)
             batch_y_train = np.append(batch_y_train, batch_y[j], axis=0)
@@ -158,7 +235,7 @@ for train_index, test_index in kf:
 
         plt.plot(batch_y_train[30000:300020], 'r', output[30000:300020], 'b')
         plt.ylabel('some numbers')
-        #plt.show()
+        plt.show()
 
         print(batch_y_train[30000:300020])
         print(output[30000:300020])
@@ -174,7 +251,7 @@ for train_index, test_index in kf:
         print("Accuracy:", accuracy.eval({X: batch_x, Y: batch_y}))
         mean_acc += accuracy
 
-print(mean_acc / 10)
+print(mean)
 
 
 sys.exit(0)
