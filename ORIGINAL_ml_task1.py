@@ -77,7 +77,6 @@ print (batch_x.shape, batch_y.shape)
 #(1000,) (1000,) (1000,) (1000,)
 #(1000, 2) (1000, 2)
 
-sys.exit(0)
 
 batch_x_train=batch_x[:,0:599]
 batch_y_train=batch_y[:,0:599]

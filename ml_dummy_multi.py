@@ -1,14 +1,14 @@
-#for multi class classification
-
 import random
+
 import numpy as np
 import tensorflow as tf
-import math, sys
+import math
 import logging
-from preprocess import preprocess as pp
+
 logging.basicConfig(level=logging.DEBUG)
 import matplotlib.pyplot as plt
 import scipy.io as sio  # The library to deal with .mat
+from sklearn.utils import shuffle
 
 # Network parameters
 n_hidden1 = 10
@@ -16,7 +16,7 @@ n_hidden2 = 10
 n_input = 2
 n_output = 2
 # Learning parameters
-learning_constant = 0.2
+learning_constant = 1.1
 number_epochs = 1000
 batch_size = 1000
 crossValidationK = 10
@@ -59,29 +59,34 @@ neural_network = multilayer_perceptron(X)
 # Define loss and optimizer
 loss_op = tf.reduce_mean(tf.math.squared_difference(neural_network, Y))
 
-#Switch to softmax
-loss_op = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(logits=neural_network,labels=Y))
+# loss_op = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(logits=neural_network,labels=Y))
 optimizer = tf.train.GradientDescentOptimizer(learning_constant).minimize(loss_op)
 
 # Initializing the variables
 init = tf.global_variables_initializer()
 
-#Init class names
-class_names = ['AU06', 'AU10', 'AU12', 'AU14', 'AU17']
+batch_x1 = np.loadtxt('x1.txt')
+batch_x2 = np.loadtxt('x2.txt')
+batch_y1 = np.loadtxt('y1.txt')
+batch_y2 = np.loadtxt('y2.txt')
 
-#STEP1 TODO: load bd4d data
-batch_x, batch_y = pp().run()
+label = batch_y2  # +1e-50-1e-50
 
-def unison_shuffled_copies(a, b):
-    assert len(a) == len(b)
-    p = np.random.permutation(len(a))
-    return a[p], b[p]
+batch_x = np.column_stack((batch_x1, batch_x2))
+batch_y = np.column_stack((batch_y1, batch_y2))
 
+label_train = label[0:99]
+
+label_test = label[600:1000]
+
+# ------------------
 # RANDOMISE
-shuffled_x, shuffled_y = unison_shuffled_copies(batch_x, batch_y)
+zipped = list(zip(batch_x, batch_y))
 
-print (shuffled_x.shape, shuffled_y.shape)
-sys.exit(0)
+random.shuffle(zipped)
+
+batch_x, batch_y = zip(*zipped)
+
 # SPLITTING
 split_x = np.array_split(batch_x, crossValidationK)
 split_y = np.array_split(batch_y, crossValidationK)
@@ -119,8 +124,6 @@ for i in range(crossValidationK):
 
         print("Prediction:", pred.eval({X: batch_x_train}))
         output = neural_network.eval({X: batch_x_train})
-
-
         plt.plot(batch_y_train[0:10], 'ro', output[0:10], 'bo')
         plt.ylabel('some numbers')
         #plt.show()

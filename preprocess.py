@@ -4,7 +4,7 @@ import csv
 import scipy.io
 
 class preprocess():
-	def run():
+	def run(self):
 		#Load .mat files for points
 		cwd = os.getcwd()
 		print(cwd)
@@ -27,8 +27,10 @@ class preprocess():
 		        all_labels_array.append(rowall_labels_array)
 
 		all_labels_array = np.asarray(all_labels_array)
-		
-		#conv (6) to (49,2)
 
-		print(len(all_points_array), len(all_labels_array))
+		#conv (6) to (49,2)
+		all_points_array = all_points_array[0:len(all_labels_array)]
 		return(all_points_array, all_labels_array)
+
+if __name__ == "__main__":
+	preprocess().run()
