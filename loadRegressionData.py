@@ -1,10 +1,11 @@
 import numpy as np
 import tensorflow as tf
-import math
-import logging
+import math, random
+import logging, sys
 logging.basicConfig(level=logging.DEBUG)
 import matplotlib.pyplot as plt
 from pandas import DataFrame
+from sklearn.model_selection import KFold
 
 import pandas as pd
 
@@ -30,9 +31,10 @@ n_hidden2 = 74
 n_hidden3 = 50
 n_input = 98
 n_output = 1
+n_slices = 10
 #Learning parameters
 learning_constant = 0.002
-number_epochs = 10000
+number_epochs = 100
 batch_size = 10000
 
 #Defining the input and the output
@@ -73,7 +75,7 @@ def multilayer_perceptron(input_d):
     layer_3 = tf.nn.sigmoid(tf.add(tf.matmul(layer_2, w3), b3))
     #Task of neurons of output layer
     out_layer = tf.add(tf.matmul(layer_3, w4),b4)
-    
+
     return out_layer
 
 #Create model
@@ -92,28 +94,98 @@ init = tf.global_variables_initializer()
 
 label=angle_array#+1e-50-1e-50
 
-batch_x=(whole_data-200)/2000
+batch_x=(whole_data-200)/20000
 temp=np.array([angle_array[:,0]])
 batch_y=temp.transpose()
 
-batch_x_train=batch_x
-batch_y_train=batch_y
+#K-FOLD PREPERATION
+#RANDOMISE
+zipped = list(zip(batch_x, batch_y))
+random.shuffle(zipped)
+batch_x, batch_y = zip(*zipped)
 
-batch_x_test=batch_x
-batch_y_test=batch_y
+#SPLIT INTO K FOLD
+kf = KFold(n_slices)
+batch_x = kf.get_n_splits(n_slices)
+batch_y = kf.get_n_splits(n_slices)
 
-label_train=label
+mean_acc = 0
+for train_index, test_index in kf:
+    #get slice?????????????? todo after din dins
+    batch_x_test=kf[i]
+    batch_y_test=kf[i]
 
-label_test=label
+    for j in range(crossValidationK):
+        if i != j:
+            batch_x_train = np.append(batch_x_train, batch_x[j], axis=0)
+            batch_y_train = np.append(batch_y_train, batch_y[j], axis=0)
 
 
+    label_train=label
+
+    label_test=label
+    with tf.Session() as sess:
+        sess.run(init)
+        #Training epoch
+        for epoch in range(number_epochs):
+            #Get one batch of images
+            #batch_x, batch_y = mnist.train.next_batch(batch_size)
+
+            #print (batch_x)
+            #print ((batch_x.shape))
+            #Run the optimizer feeding the network with the batch
+            sess.run(optimizer, feed_dict={X: batch_x_train, Y: batch_y_train})
+            #Display the epoch
+            if epoch % 100 == 0 and epoch>10:
+                print("Epoch:", '%d' % (epoch))
+                print("Accuracy:", loss_op.eval({X: batch_x_train, Y: batch_y_train}) )
+
+
+        # Test model
+        pred = (neural_network)  # Apply softmax to logits
+        accuracy=tf.keras.losses.MSE(pred,Y)
+        print("Accuracy:", np.square(accuracy.eval({X: batch_x_train, Y: batch_y_train})).mean() )
+        #tf.keras.evaluate(pred,batch_x)
+
+        print("Prediction:", pred.eval({X: batch_x_train}))
+        print(batch_y)
+
+        output=neural_network.eval({X: batch_x_train})
+        plt.plot(batch_y_train, 'r', output, 'b')
+        plt.ylabel('some numbers')
+        plt.show()
+
+
+        plt.plot(batch_y_train[30000:300020], 'r', output[30000:300020], 'b')
+        plt.ylabel('some numbers')
+        #plt.show()
+
+        print(batch_y_train[30000:300020])
+        print(output[30000:300020])
+
+        df = DataFrame(output)
+
+        export_csv = df.to_csv ('output.csv', index = None, header=True) #Don't forget to add '.csv' at the end of the path
+
+        print (df)
+        #correct_prediction = tf.math.subtract((pred), (Y))
+        # Calculate accuracy
+        accuracy = tf.reduce_mean(tf.cast(correct_prediction, "float"))
+        print("Accuracy:", accuracy.eval({X: batch_x, Y: batch_y}))
+        mean_acc += accuracy
+
+print(mean_acc / 10)
+
+
+sys.exit(0)
+'''
 with tf.Session() as sess:
     sess.run(init)
     #Training epoch
     for epoch in range(number_epochs):
         #Get one batch of images
         #batch_x, batch_y = mnist.train.next_batch(batch_size)
-        
+
         #print (batch_x)
         #print ((batch_x.shape))
         #Run the optimizer feeding the network with the batch
@@ -137,23 +209,21 @@ with tf.Session() as sess:
     plt.plot(batch_y_train, 'r', output, 'b')
     plt.ylabel('some numbers')
     plt.show()
-   
+
 
     plt.plot(batch_y_train[30000:300020], 'r', output[30000:300020], 'b')
     plt.ylabel('some numbers')
     plt.show()
-    
+
     print(batch_y_train[30000:300020])
     print(output[30000:300020])
-    
+
     df = DataFrame(output)
 
     export_csv = df.to_csv ('output.csv', index = None, header=True) #Don't forget to add '.csv' at the end of the path
 
     print (df)
 
-    
-    #correct_prediction = tf.math.subtract((pred), (Y))
-    # Calculate accuracy
-    #accuracy = tf.reduce_mean(tf.cast(correct_prediction, "float"))
-    #print("Accuracy:", accuracy.eval({X: batch_x, Y: batch_y}))
+
+
+'''
