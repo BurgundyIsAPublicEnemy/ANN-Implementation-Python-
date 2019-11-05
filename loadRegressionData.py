@@ -34,7 +34,7 @@ n_output = 1
 n_slices = 10
 #Learning parameters
 learning_constant = 0.02
-number_epochs = 100
+number_epochs = 1
 batch_size = 10000
 
 #Defining the input and the output
@@ -110,7 +110,7 @@ batch_x = np.array_split(batch_x, n_slices)
 batch_y = np.array_split(batch_y, n_slices)
 angle_array = np.array_split(batch_y, n_slices)
 mean_acc = 0
-
+mean_loss_acc = 0
 for train_index, test_index in kf.split(batch_x):
     print(train_index, test_index)
     label=angle_array[int(test_index)]#+1e-50-1e-50
@@ -154,7 +154,7 @@ for train_index, test_index in kf.split(batch_x):
         print("Accuracy:", ac1)
         print("ACC1:", loss_op.eval({X: batch_x_test, Y: batch_y_test}))
         print("ACC2:", accuracy.eval({X: batch_x_test, Y: batch_y_test}))
-        accuracy = accuracy.eval({X: batch_x_test, Y: batch_y_test})
+        loss_acc = loss_op.eval({X: batch_x_test, Y: batch_y_test})
         #tf.keras.evaluate(pred,batch_x)
 
         print("Prediction:", pred.eval({X: batch_x_test}))
@@ -163,7 +163,7 @@ for train_index, test_index in kf.split(batch_x):
         output=neural_network.eval({X: batch_x_test})
         plt.plot(batch_y_test, 'r', output, 'b')
         plt.ylabel('some numbers')
-        plt.show()
+        #plt.show()
 
 
         plt.plot(batch_y_train[30000:300020], 'r', output[30000:300020], 'b')
@@ -180,16 +180,19 @@ for train_index, test_index in kf.split(batch_x):
 
         #print(accuracy)
         mean_acc += ac1
+        mean_loss_acc += loss_acc
         batch_x_train = []
         batch_y_train = []
+
+mean_acc = mean_acc / n_slices
 
 try:
     print('Mean accuracy: ', mean_acc)
     f = open("reportlog.txt", "a")
     f.write('\n\n\n\n')
-    f.write("HYPERPARAMS: ", "HIDDEN LAYER 1 NO. NODES:", n_hidden1, "HIDDEN LAYER 2 NO. NODES:", n_hidden2, "HIDDEN LAYER 3 NO. NODES:", n_hidden3, "INPUT NODES:", n_input, "OUTPUT NODES:", n_output, "NSLICES", n_slices)
-    f.write("HYPERPARAMS 2 : LEARNING_CONSTANT:", learning_constant, "NO EPOCHS:", number_epochs, "BATCHSIZE:", batch_size)
-    f.write("MEAN MSE ACC:", mean_acc, "MEAN LOSS ACC", mean_loss_acc)
+    f.write(("HYPERPARAMS: " + " \n HIDDEN LAYER 1 NO. NODES: " + str(n_hidden1) + "\n HIDDEN LAYER 2 NO. NODES: " + str(n_hidden2) + "\n HIDDEN LAYER 3 NO. NODES: " + str(n_hidden3) + "\n INPUT NODES: " +  str(n_input) + "\n OUTPUT NODES: " + str(n_output) +  "\n NSLICES: " + str(n_slices)))
+    f.write(("HYPERPARAMS 2: \n LEARNING_CONSTANT: " + str(learning_constant) + "\n NO EPOCHS: " + str(number_epochs) + "\n BATCHSIZE: " + str(batch_size)))
+    f.write(("\n MEAN MSE ACC: " + str(mean_acc) + "\n MEAN LOSS ACC: " + str(mean_loss_acc)))
     f.write('\n\n\n\n')
     f.close()
 except Exception as e:
