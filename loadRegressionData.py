@@ -105,7 +105,7 @@ batch_x, batch_y = zip(*zipped)
 #Set up the K-Fold Cross Validation
 kf = KFold(n_slices)
 
-#Slice batch x into 
+#Slice batch x into
 batch_x = np.array_split(batch_x, n_slices)
 batch_y = np.array_split(batch_y, n_slices)
 angle_array = np.array_split(batch_y, n_slices)
@@ -150,17 +150,17 @@ for train_index, test_index in kf.split(batch_x):
         # Test model
         pred = (neural_network)  # Apply softmax to logits
         accuracy=tf.keras.losses.MSE(pred,Y)
-        print("Accuracy:", np.square(accuracy.eval({X: batch_x_train, Y: batch_y_train})).mean() )
-        print("ACC1:", loss_op.eval({X: batch_x_train, Y: batch_y_train}))
-        print("ACC2:", accuracy.eval({X: batch_x_train, Y: batch_y_train}))
-        accuracy = accuracy.eval({X: batch_x_train, Y: batch_y_train})
+        print("Accuracy:", np.square(accuracy.eval({X: batch_x_test, Y: batch_y_test})).mean() )
+        print("ACC1:", loss_op.eval({X: batch_x_test, Y: batch_y_test}))
+        print("ACC2:", accuracy.eval({X: batch_x_test, Y: batch_y_test}))
+        accuracy = accuracy.eval({X: batch_x_test, Y: batch_y_test})
         #tf.keras.evaluate(pred,batch_x)
 
-        print("Prediction:", pred.eval({X: batch_x_train}))
+        print("Prediction:", pred.eval({X: batch_x_test}))
         print(batch_y)
 
-        output=neural_network.eval({X: batch_x_train})
-        plt.plot(batch_y_train, 'r', output, 'b')
+        output=neural_network.eval({X: batch_x_test})
+        plt.plot(batch_y_test, 'r', output, 'b')
         plt.ylabel('some numbers')
         plt.show()
 
