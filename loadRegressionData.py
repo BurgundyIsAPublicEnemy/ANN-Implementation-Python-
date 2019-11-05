@@ -150,7 +150,8 @@ for train_index, test_index in kf.split(batch_x):
         # Test model
         pred = (neural_network)  # Apply softmax to logits
         accuracy=tf.keras.losses.MSE(pred,Y)
-        print("Accuracy:", np.square(accuracy.eval({X: batch_x_test, Y: batch_y_test})).mean() )
+        ac1 = np.square(accuracy.eval({X: batch_x_test, Y: batch_y_test})).mean()
+        print("Accuracy:", ac1)
         print("ACC1:", loss_op.eval({X: batch_x_test, Y: batch_y_test}))
         print("ACC2:", accuracy.eval({X: batch_x_test, Y: batch_y_test}))
         accuracy = accuracy.eval({X: batch_x_test, Y: batch_y_test})
@@ -167,7 +168,7 @@ for train_index, test_index in kf.split(batch_x):
 
         plt.plot(batch_y_train[30000:300020], 'r', output[30000:300020], 'b')
         plt.ylabel('some numbers')
-        plt.show()
+        #plt.show()
 
         print(batch_y_train[30000:300020])
         print(output[30000:300020])
@@ -178,13 +179,19 @@ for train_index, test_index in kf.split(batch_x):
         print (df)
 
         #print(accuracy)
-        mean_acc += accuracy
+        mean_acc += ac1
         batch_x_train = []
         batch_y_train = []
 
-print(mean)
-
-
-
-
-sys.exit(0)
+try:
+    print('Mean accuracy: ', mean_acc)
+    f = open("reportlog.txt", "a")
+    f.write('\n\n\n\n')
+    f.write("HYPERPARAMS: ", "HIDDEN LAYER 1 NO. NODES:", n_hidden1, "HIDDEN LAYER 2 NO. NODES:", n_hidden2, "HIDDEN LAYER 3 NO. NODES:", n_hidden3, "INPUT NODES:", n_input, "OUTPUT NODES:", n_output, "NSLICES", n_slices)
+    f.write("HYPERPARAMS 2 : LEARNING_CONSTANT:", learning_constant, "NO EPOCHS:", number_epochs, "BATCHSIZE:", batch_size)
+    f.write("MEAN MSE ACC:", mean_acc, "MEAN LOSS ACC", mean_loss_acc)
+    f.write('\n\n\n\n')
+    f.close()
+except Exception as e:
+    print(e)
+    print('Something went wrong here so Mean accuracy: ', mean_acc)
