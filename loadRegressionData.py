@@ -105,6 +105,7 @@ batch_x, batch_y = zip(*zipped)
 #Set up the K-Fold Cross Validation
 kf = KFold(n_slices)
 
+#Slice batch x into 
 batch_x = np.array_split(batch_x, n_slices)
 batch_y = np.array_split(batch_y, n_slices)
 angle_array = np.array_split(batch_y, n_slices)
