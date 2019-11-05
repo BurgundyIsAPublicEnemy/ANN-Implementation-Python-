@@ -35,7 +35,7 @@ n_slices = 10
 #Learning parameters
 learning_constant = 0.02
 number_epochs = 100
-batch_size = 1000
+batch_size = 10000
 
 #Defining the input and the output
 X = tf.placeholder("float", [None, n_input])
@@ -92,7 +92,7 @@ init = tf.global_variables_initializer()
 #Create a session
 
 
-batch_x=(whole_data-200)/20000
+batch_x=(whole_data-200)/2000
 temp=np.array([angle_array[:,0]])
 batch_y=temp.transpose()
 
@@ -171,7 +171,6 @@ for train_index, test_index in kf.split(batch_x):
 
         print(batch_y_train[30000:300020])
         print(output[30000:300020])
-
         df = DataFrame(output)
 
         export_csv = df.to_csv ('output.csv', index = None, header=True) #Don't forget to add '.csv' at the end of the path
