@@ -201,7 +201,7 @@ for train_index, test_index in kf.split(batch_x):
 mean_acc = mean_acc / n_slices
 mean_per_acc = mean_per_acc / n_slices
 
-#Report back 
+#Report back accuracy and HYPERPARAMS
 try:
     print('Mean accuracy: ', mean_acc)
     f = open("reportlog.txt", "a")
