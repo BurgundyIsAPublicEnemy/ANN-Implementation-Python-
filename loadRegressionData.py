@@ -69,11 +69,11 @@ w4 = tf.Variable(tf.random_normal([n_hidden3, n_output]))
 #network is input_d
 def multilayer_perceptron(input_d):
     #Task of neurons of first hidden layer
-    layer_1 = tf.nn.tanh(tf.add(tf.matmul(input_d, w1), b1))
+    layer_1 = tf.nn.sigmoid(tf.add(tf.matmul(input_d, w1), b1))
     #Task of neurons of second hidden layer
-    layer_2 = tf.nn.tanh(tf.add(tf.matmul(layer_1, w2), b2))
+    layer_2 = tf.nn.sigmoid(tf.add(tf.matmul(layer_1, w2), b2))
     #Task of neurons of output layer
-    layer_3 = tf.nn.tanh(tf.add(tf.matmul(layer_2, w3), b3))
+    layer_3 = tf.nn.sigmoid(tf.add(tf.matmul(layer_2, w3), b3))
     #Task of neurons of output layer
     out_layer = tf.add(tf.matmul(layer_3, w4),b4)
 
