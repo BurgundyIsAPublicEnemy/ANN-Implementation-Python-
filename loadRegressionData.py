@@ -28,7 +28,7 @@ angle_arrayt=angle_array.transpose()
 
 #Network parameters
 n_hidden1 = 147
-n_hidden2 = 74
+n_hidden2 = 75
 n_hidden3 = 50
 n_input = 98
 n_output = 1
@@ -69,11 +69,11 @@ w4 = tf.Variable(tf.random_normal([n_hidden3, n_output]))
 #network is input_d
 def multilayer_perceptron(input_d):
     #Task of neurons of first hidden layer
-    layer_1 = tf.nn.sigmoid(tf.add(tf.matmul(input_d, w1), b1))
+    layer_1 = tf.nn.tanh(tf.add(tf.matmul(input_d, w1), b1))
     #Task of neurons of second hidden layer
-    layer_2 = tf.nn.sigmoid(tf.add(tf.matmul(layer_1, w2), b2))
+    layer_2 = tf.nn.tanh(tf.add(tf.matmul(layer_1, w2), b2))
     #Task of neurons of output layer
-    layer_3 = tf.nn.sigmoid(tf.add(tf.matmul(layer_2, w3), b3))
+    layer_3 = tf.nn.tanh(tf.add(tf.matmul(layer_2, w3), b3))
     #Task of neurons of output layer
     out_layer = tf.add(tf.matmul(layer_3, w4),b4)
 
@@ -136,8 +136,6 @@ for train_index, test_index in kf.split(batch_x):
         except:
             batch_x_train = batch_x[j]
             batch_y_train = batch_y[j]
-    #For debug: check size of arrays
-    print(len(batch_x_train), len(batch_y_train), len(batch_x_test), len(batch_y_test))
 
     #Set label arrays
     label_train=label
@@ -162,10 +160,6 @@ for train_index, test_index in kf.split(batch_x):
         ac1 = np.square(accuracy.eval({X: batch_x_test, Y: batch_y_test})).mean()
         #tf.keras.evaluate(pred,batch_x)
 
-        #Predict using model
-        print("Prediction:", pred.eval({X: batch_x_test}))
-        print(batch_y)
-
         #Plot predictions
         output=neural_network.eval({X: batch_x_test})
         plt.plot(batch_y_test, 'r', output, 'b')
@@ -178,28 +172,20 @@ for train_index, test_index in kf.split(batch_x):
         #plt.show()
 
         #Debug: output the output of model
-        print(batch_y_train[30000:300020])
-        print(output[30000:300020])
-        df = DataFrame(output)
-        export_csv = df.to_csv ('output.csv', index = None, header=True) #Don't forget to add '.csv' at the end of the path
-        print (df)
-
-        # Calculate percentage accuracy
-        correct_prediction = tf.equal(tf.argmax(pred[0:batch_size], 1),batch_y_test[0:batch_size])
-        accuracy1 = tf.reduce_mean(tf.cast(correct_prediction, "float"))
-        per_acc = accuracy1.eval({X: batch_x_test[0:batch_size], Y: batch_y_test[0:batch_size]})
-        print("Accuracy:", per_acc)
+        # print(batch_y_train[30000:300020])
+        # print(output[30000:300020])
+        # df = DataFrame(output)
+        # export_csv = df.to_csv ('output.csv', index = None, header=True) #Don't forget to add '.csv' at the end of the path
+        # print (df)
 
         #Sum for mean accuracy
         mean_acc += ac1
-        mean_per_acc += per_acc
         #Reset batches for data
         batch_x_train = []
         batch_y_train = []
 
 #Calculate mean averages
 mean_acc = mean_acc / n_slices
-mean_per_acc = mean_per_acc / n_slices
 
 #Report back accuracy and HYPERPARAMS
 try:
@@ -208,7 +194,7 @@ try:
     f.write('\n\n\n')
     f.write(("HYPERPARAMS: " + " \n HIDDEN LAYER 1 NO. NODES: " + str(n_hidden1) + "\n HIDDEN LAYER 2 NO. NODES: " + str(n_hidden2) + "\n HIDDEN LAYER 3 NO. NODES: " + str(n_hidden3) + "\n INPUT NODES: " +  str(n_input) + "\n OUTPUT NODES: " + str(n_output) +  "\n NSLICES: " + str(n_slices)))
     f.write(("\n HYPERPARAMS 2: \n LEARNING_CONSTANT: " + str(learning_constant) + "\n NO EPOCHS: " + str(number_epochs) + "\n BATCHSIZE: " + str(batch_size)))
-    f.write(("\n MEAN MSE ACC: " + str(mean_acc) + "\n MEAN PERCENTAGE ACC: " + str(mean_per_acc)))
+    f.write(("\n MEAN MSE ACC: " + str(mean_acc)))
     f.write('\n\n\n')
     f.close()
 except Exception as e:
