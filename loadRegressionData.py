@@ -92,7 +92,7 @@ optimizer = tf.train.GradientDescentOptimizer(learning_constant).minimize(loss_o
 init = tf.global_variables_initializer()
 #Create a session
 
-
+#Initialize and prepare data sets
 batch_x=(whole_data-200)/2000
 temp=np.array([angle_array[:,0]])
 batch_y=temp.transpose()
@@ -106,39 +106,47 @@ batch_x, batch_y = zip(*zipped)
 #Set up the K-Fold Cross Validation
 kf = KFold(n_slices)
 
-#Slice batch x into
+#Slice batches into n_slices
 batch_x = np.array_split(batch_x, n_slices)
 batch_y = np.array_split(batch_y, n_slices)
 angle_array = np.array_split(batch_y, n_slices)
+
+#Initialize mean accuracy variables for reporting
 mean_acc = 0
 mean_per_acc = 0
-for train_index, test_index in kf.split(batch_x):
-    print(train_index, test_index)
-    label=angle_array[int(test_index)]#+1e-50-1e-50
 
+#Generate arrays of indexes based on number of slices in the K fold
+for train_index, test_index in kf.split(batch_x):
+    #Show which indexes we are using
+    print(train_index, test_index)
+
+    #Setting test labels
+    label=angle_array#+1e-50-1e-50
+
+    #Setting test batches
     batch_x_test=batch_x[int(test_index)]
     batch_y_test=batch_y[int(test_index)]
 
+    #Setting training batches by iterating over the training arrays
     for j in train_index:
+        #if training batches aren't init. build them
         try:
             batch_x_train = np.append(batch_x_train, batch_x[j], axis=0)
             batch_y_train = np.append(batch_y_train, batch_y[j], axis=0)
         except:
             batch_x_train = batch_x[j]
             batch_y_train = batch_y[j]
+    #For debug: check size of arrays
     print(len(batch_x_train), len(batch_y_train), len(batch_x_test), len(batch_y_test))
-    label_train=label
 
+    #Set label arrays
+    label_train=label
     label_test=label
+
     with tf.Session() as sess:
         sess.run(init)
         #Training epoch
         for epoch in range(number_epochs):
-            #Get one batch of images
-            #batch_x, batch_y = mnist.train.next_batch(batch_size)
-
-            #print (batch_x)
-            #print ((batch_x.shape))
             #Run the optimizer feeding the network with the batch
             sess.run(optimizer, feed_dict={X: batch_x_train, Y: batch_y_train})
             #Display the epoch
@@ -152,45 +160,48 @@ for train_index, test_index in kf.split(batch_x):
         pred = (neural_network)  # Apply softmax to logits
         accuracy=tf.keras.losses.MSE(pred,Y)
         ac1 = np.square(accuracy.eval({X: batch_x_test, Y: batch_y_test})).mean()
-        print("Accuracy:", ac1)
-        print("ACC1:", loss_op.eval({X: batch_x_test, Y: batch_y_test}))
-        print("ACC2:", accuracy.eval({X: batch_x_test, Y: batch_y_test}))
         #tf.keras.evaluate(pred,batch_x)
 
+        #Predict using model
         print("Prediction:", pred.eval({X: batch_x_test}))
         print(batch_y)
 
+        #Plot predictions
         output=neural_network.eval({X: batch_x_test})
         plt.plot(batch_y_test, 'r', output, 'b')
         plt.ylabel('some numbers')
         #plt.show()
 
-
+        #Second plot
         plt.plot(batch_y_train[30000:300020], 'r', output[30000:300020], 'b')
         plt.ylabel('some numbers')
         #plt.show()
 
+        #Debug: output the output of model
         print(batch_y_train[30000:300020])
         print(output[30000:300020])
         df = DataFrame(output)
-
         export_csv = df.to_csv ('output.csv', index = None, header=True) #Don't forget to add '.csv' at the end of the path
-
         print (df)
 
+        # Calculate percentage accuracy
         correct_prediction = tf.equal(tf.argmax(pred[0:batch_size], 1),batch_y_test[0:batch_size])
-        # Calculate accuracy
         accuracy1 = tf.reduce_mean(tf.cast(correct_prediction, "float"))
         per_acc = accuracy1.eval({X: batch_x_test[0:batch_size], Y: batch_y_test[0:batch_size]})
         print("Accuracy:", per_acc)
 
+        #Sum for mean accuracy
         mean_acc += ac1
         mean_per_acc += per_acc
+        #Reset batches for data
         batch_x_train = []
         batch_y_train = []
 
+#Calculate mean averages
 mean_acc = mean_acc / n_slices
+mean_per_acc = mean_per_acc / n_slices
 
+#Report back 
 try:
     print('Mean accuracy: ', mean_acc)
     f = open("reportlog.txt", "a")
